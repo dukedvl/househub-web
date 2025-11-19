@@ -8,8 +8,6 @@ import WeatherOverview from './WeatherOverview.tsx'
 import {
   RouterProvider,
   createBrowserRouter,
-  createRoutesFromElements,
-  Route,
 } from "react-router-dom";
 
 const router = createBrowserRouter([

@@ -17,7 +17,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
     // Y axis
-    const [yMin, yMax] = d3.extent(data, (d) => d.y);
+    const [yMax] = d3.extent(data, (d) => d.y);
     const yScale = useMemo(() => {
         return d3
             .scaleLinear()
@@ -43,11 +43,13 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
         const svgElement = d3.select(axesRef.current);
         svgElement.selectAll("*").remove();
 
+
         const xAxis = d3
             .axisBottom(xScale)
             .tickSize(10)
             .tickSizeOuter(0)
             .ticks(data.length / 2)
+            //@ts-ignore 2769
             .tickFormat(d3.timeFormat("%_I%p"))
             .tickPadding(20);
 
@@ -58,7 +60,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             .attr("transform", `translate(${0}, ${height - MARGIN.bottom - MARGIN.top})`)
             .attr("font-weight", "50")
             .attr("font-family", '"Roboto", "sans-serif"')
-            .call(xAxis);
+            .call(xAxis, 0);
 
         const yAxisGenerator = d3.axisLeft(yScale);
 
