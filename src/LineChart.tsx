@@ -17,7 +17,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
     // Y axis
-    const [yMax] = d3.extent(data, (d) => d.y);
+    const [yMin, yMax] = d3.extent(data, (d) => d.y);
     const yScale = useMemo(() => {
         return d3
             .scaleLinear()
