@@ -21,7 +21,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     const yScale = useMemo(() => {
         return d3
             .scaleLinear()
-            .domain([0, yMax || 0])
+            .domain([(yMin??0) *0.1, yMax || 0])
             .range([boundsHeight, 0])
             .nice();
     }, [data, height]);
