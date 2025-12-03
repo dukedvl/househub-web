@@ -34,8 +34,9 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     const xScale = useMemo(() => {
         return d3
             .scaleTime()
-            .domain([xMin || 0, d3.timeHour.offset(xMax as Date,1) || 0])
-            .range([0, width])
+            .domain([xMin || new Date(), d3.timeHour.offset(xMax as Date,1) || new Date()])
+            // use the inner width so the line and points align with the axes
+            .range([0, boundsWidth])
             .nice();
     }, [data, width]);
 
@@ -49,7 +50,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             .tickSize(10)
             .tickSizeOuter(0)
             .ticks(data.length / 2)
-            //@ts-ignore 2769
+            // @ts-ignore: d3 typings are awkward for timeFormat here
             .tickFormat(d3.timeFormat("%_I%p"))
             .tickPadding(20);
 
@@ -58,9 +59,11 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             .append("g")
             .attr("class", "x axis")
             .attr("transform", `translate(${0}, ${height - MARGIN.bottom - MARGIN.top})`)
-            .attr("font-weight", "50")
             .attr("font-family", '"Roboto", "sans-serif"')
-            .call(xAxis, 0);
+            .call(xAxis, 0)
+            // make tick labels bold
+            .selectAll(".tick text")
+            .attr("font-weight", "500");
 
         const yAxisGenerator = d3.axisLeft(yScale);
 
@@ -75,7 +78,8 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             exit => exit.remove()
         )
         .attr("r", 5)
-        .attr("cx", (d) => xScale(d.x.valueOf()))
+        // use Date directly so it matches the scale's domain type
+        .attr("cx", (d) => xScale(d.x))
         .attr("cy", (d) => yScale(d.y))
         .attr("stroke", "#000000")
         .attr("fill", "#000000");
@@ -147,7 +151,8 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     // Build the line
     const lineBuilder = d3
         .line<DataPoint>()
-        .x((d) => xScale(d.x.valueOf()))
+        // use Date directly so the scale maps correctly
+        .x((d) => xScale(d.x) as number)
         .y((d) => yScale(d.y));
 
     const linePath = lineBuilder(data);
@@ -168,7 +173,8 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
                 >
                     <path
                         d={linePath}
-                        stroke="#FFFFFF"
+                        // make the line visible (was white on white)
+                        stroke="#000000"
                         fill="none"
                         strokeWidth={2.5}
                     />
